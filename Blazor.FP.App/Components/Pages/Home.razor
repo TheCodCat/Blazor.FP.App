@@ -1,5 +1,7 @@
 ﻿@page "/"
+@using PasswordGenerator
 @rendermode InteractiveServer
+@inject IPasswordGenerator generator
 
 <PageTitle>Восстановление пароля</PageTitle>
 
@@ -35,8 +37,9 @@
             
             @if (isTake)
             {
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1em">
-                    <RadzenSecurityCode Type="SecurityCodeType.Numeric" Count="4" Gap="0.5em"/>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1em">
+                    <RadzenSecurityCode Change="Callback" Type="SecurityCodeType.Numeric" Count="4" Gap="0.5em"/>
+                    <RadzenText>@otp</RadzenText>
                 </RadzenStack>
             }
             
@@ -52,6 +55,8 @@
     private Model _model = new Model();
     private bool isBusy = false;
     private bool isTake;
+    private string otp = string.Empty;
+    
 
     class Model
     {
@@ -68,7 +73,7 @@
             offset = offset.Subtract(substract);
             StateHasChanged();
         }
-
+        offset = TimeSpan.Zero;
         isBusy = false;
     }
 
@@ -77,5 +82,12 @@
         offset = TimeSpan.Zero;
         isTake = true;
         isBusy = false;
+        
+        otp = Password.ForOtp(4).Next();
+    }
+
+    private void Callback(string obj)
+    {
+        
     }
 }

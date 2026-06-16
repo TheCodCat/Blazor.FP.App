@@ -6,4 +6,13 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
+      <PackageReference Include="EF.Core.Repositories" Version="1.2.2" />
+      <PackageReference Include="Mapster" Version="10.0.8" />
+      <PackageReference Include="Mapster.Async" Version="10.0.8" />
+      <PackageReference Include="Mapster.DependencyInjection" Version="10.0.8" />
+      <PackageReference Include="Mapster.EFCore" Version="10.0.8" />
+    </ItemGroup>
+
 </Project>

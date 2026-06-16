@@ -8,7 +8,28 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
+      <PackageReference Include="EF.Core.Repositories" Version="1.2.2" />
+      <PackageReference Include="Mapster" Version="10.0.8" />
+      <PackageReference Include="Mapster.Async" Version="10.0.8" />
+      <PackageReference Include="Mapster.DependencyInjection" Version="10.0.8" />
+      <PackageReference Include="Mapster.EFCore" Version="10.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="PasswordGenerator" Version="3.0.0" />
       <PackageReference Include="Radzen.Blazor" Version="10.4.9" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Blazor.FP.Datacontext\Blazor.FP.Datacontext.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,8 @@
 using Blazor.FP.App.Components;
+using Blazor.FP.Datacontext.Datacontext;
+using EF.Core.Repositories.Extensions;
+using Microsoft.EntityFrameworkCore;
+using PasswordGenerator;
 using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.ConfigureData<Forgotcontext>();
+builder.Services.AddDbContextFactory<Forgotcontext>();
+
+builder.Services.AddPasswordGenerator(options =>
+{
+    options.Length = 4;
+    options.IncludeNumeric = true;
+});
 
 builder.Services.AddRadzenComponents();
 
@@ -27,5 +40,11 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider.GetRequiredService<Forgotcontext>();
+    services.Database.Migrate();
+}
 
 app.Run();

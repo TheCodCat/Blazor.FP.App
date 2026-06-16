@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Blazor.FP.App/Blazor.FP.App.csproj" />
+  <Project Path="Blazor.FP.BL/Blazor.FP.BL.csproj" />
   <Project Path="Blazor.FP.Datacontext/Blazor.FP.Datacontext.csproj" />
   <Project Path="Blazor.FP.Datamodels.models/Blazor.FP.Datamodels.models.csproj" />
 </Solution>
