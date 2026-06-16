@@ -1,4 +1,5 @@
 using Blazor.FP.App.Components;
+using Blazor.FP.BL.request;
 using Blazor.FP.Datacontext.Datacontext;
 using EF.Core.Repositories.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,11 @@ builder.Services.AddPasswordGenerator(options =>
 });
 
 builder.Services.AddRadzenComponents();
+
+builder.Services.AddMediatR(cnf =>
+{
+    cnf.RegisterServicesFromAssembly(typeof(SendOTPRequest).Assembly);
+});
 
 var app = builder.Build();
 

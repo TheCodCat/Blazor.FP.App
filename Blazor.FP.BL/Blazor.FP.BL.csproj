@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
       <PackageReference Include="Flurl" Version="4.0.0" />
       <PackageReference Include="Flurl.Http" Version="4.0.2" />
       <PackageReference Include="MediatR" Version="14.1.0" />
@@ -14,9 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="dtos\" />
-      <Folder Include="handles\" />
-      <Folder Include="request\" />
+      <ProjectReference Include="..\Blazor.FP.Datacontext\Blazor.FP.Datacontext.csproj" />
+      <ProjectReference Include="..\Blazor.FP.Datamodels.models\Blazor.FP.Datamodels.models.csproj" />
     </ItemGroup>
 
 </Project>

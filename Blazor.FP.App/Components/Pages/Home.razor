@@ -1,7 +1,11 @@
 ﻿@page "/"
 @using PasswordGenerator
+@using MediatR
+@using Blazor.FP.BL.dtos
 @rendermode InteractiveServer
 @inject IPasswordGenerator generator
+@inject NavigationManager nav
+@inject IMediator meditor
 
 <PageTitle>Восстановление пароля</PageTitle>
 
@@ -11,27 +15,33 @@
         <RadzenFieldset Text="Восстановление пароля">
         <RadzenStack Gap="2em" class="rz-m-4">
             <RadzenTemplateForm TItem="Model" Data="@_model" Submit="@ActiveDelay">
-                <RadzenStack Gap="1rem">
-                    
-                    <RadzenStack Reverse="true" Orientation="Orientation.Horizontal" Gap="1rem">
-                        <RadzenStack Gap="20px" Orientation="Orientation.Vertical">
-                            
-                            <div style="position: relative;">
-                                <RadzenTextBox Placeholder="Login" Name="Login" @bind-Value="@_model.Login" Style="display: block; width: 100%;"/>
-                                <RadzenRequiredValidator Component="Login" Text="Логин обязателен" Popup="true"/>
-                            </div>
-                            <div style="position: relative;">
-                                <RadzenTextBox Placeholder="Email" Name="Email" @bind-Value="@_model.Email" Style="display: block; width: 100%;"/>
-                                <RadzenRequiredValidator Component="Email" Text="Почта обязательна" Popup="true"/>
-                                <RadzenEmailValidator Component="Email" Text="Введите корректную почту" Popup="true"/>
-                            </div>
 
+                <RadzenStack Gap="1em">
+                    <RadzenRow  Gap="2rem">
+
+                        <RadzenColumn Size="12" SizeMD="2">
+                            <RadzenLabel Text="Логин"/>
+                            </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="10">
+                            <RadzenTextBox Placeholder="Login" Name="Login" @bind-Value="@_model.Login" Style="display: block; width: 100%;"/>
+                            <RadzenRequiredValidator Component="Login" Text="Логин обязателен" Popup="true" style="position: relative;"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="2">
+                            <RadzenLabel Text="Почта" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="10">
+                            <RadzenTextBox Placeholder="Email" Name="Email" @bind-Value="@_model.Email" Style="display: block; width: 100%;"/>
+                            <RadzenRequiredValidator Component="Email" Text="Почта обязательна" Popup="true" style="position: relative;" />
+                            <RadzenEmailValidator Component="Email" Text="Введите корректную почту" Popup="true" style="position: relative;" />
+                        </RadzenColumn>
+
+                    </RadzenRow>
+                    <RadzenRow>
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenButton ButtonType="ButtonType.Submit" Disabled="@(isBusy)" IsBusy="@isBusy" Text="Отправить код" ButtonStyle="ButtonStyle.Primary"/>
+                            <RadzenButton Text="Получил" Disabled="@(!isBusy)" Click="@(() => TakeCode())" ButtonStyle="ButtonStyle.Info"/>
                         </RadzenStack>
-                    </RadzenStack>
-                    <RadzenStack Orientation="Orientation.Horizontal">
-                        <RadzenButton ButtonType="ButtonType.Submit" Disabled="@(isBusy)" Text="@(offset.ToString())" ButtonStyle="ButtonStyle.Primary"/>
-                        <RadzenButton Text="Получил" Disabled="@(!isBusy)" Click="@(() => TakeCode())" ButtonStyle="ButtonStyle.Info"/>
-                    </RadzenStack>
+                    </RadzenRow>
                 </RadzenStack>
             </RadzenTemplateForm>
             
@@ -39,7 +49,7 @@
             {
                 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1em">
                     <RadzenSecurityCode Change="Callback" Type="SecurityCodeType.Numeric" Count="4" Gap="0.5em"/>
-                    <RadzenText>@otp</RadzenText>
+                    <RadzenText>@(otp?.OTPCode ?? string.Empty)</RadzenText>
                 </RadzenStack>
             }
             
@@ -55,8 +65,8 @@
     private Model _model = new Model();
     private bool isBusy = false;
     private bool isTake;
-    private string otp = string.Empty;
-    
+    private ForgotPasswordResponceDto otp;
+
 
     class Model
     {
@@ -79,15 +89,36 @@
 
     private async Task TakeCode()
     {
-        offset = TimeSpan.Zero;
-        isTake = true;
-        isBusy = false;
-        
-        otp = Password.ForOtp(4).Next();
+        try
+        {
+            offset = TimeSpan.Zero;
+            isTake = true;
+            isBusy = false;
+
+            var request = new BL.request.SendOTPRequest(new Datamodels.models.Models.ForgotPasswordRequest(_model.Login, _model.Email));
+            var resultOtp = await meditor.Send(request);
+            if (resultOtp.IsSuccess)
+                otp = resultOtp.Value;
+        }
+        catch(Exception ex)
+        {
+
+        }
     }
 
     private void Callback(string obj)
     {
-        
+        try
+        {
+            if(otp is not null && string.Equals(obj, otp?.OTPCode))
+            {
+                if(DateTime.Now <= otp.Created_in.AddMinutes(otp.Offset.TotalMinutes))
+                    nav.NavigateTo($"/change/{otp.RequestId}");
+            }
+        }
+        catch(Exception ex)
+        {
+            
+        }
     }
 }

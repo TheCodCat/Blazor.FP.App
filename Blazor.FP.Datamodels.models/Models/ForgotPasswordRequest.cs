@@ -6,4 +6,10 @@ public class ForgotPasswordRequest
     public string Login { get; set; }
     public string Email { get; set; }
     public ForgotPasswordResponce Responce { get; set; }
+
+    public ForgotPasswordRequest(string login, string email)
+    {
+        Login = login;
+        Email = email;
+    }
 }

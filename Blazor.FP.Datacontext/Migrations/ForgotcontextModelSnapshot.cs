@@ -42,6 +42,9 @@ namespace Blazor.FP.Datacontext.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("Created_in")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("OTPCode")
                         .IsRequired()
                         .HasColumnType("TEXT");
