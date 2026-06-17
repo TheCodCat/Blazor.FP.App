@@ -24,7 +24,7 @@ namespace Blazor.FP.BL.handles
             try
             {
                 await Task.Delay(7000);
-
+                
                 var result = new ChangePasswordResponce() { Login = request.Dto.Login, RequestId = request.Dto.Id, Result = true };
                 
                 //аля запрос на изменение пароля

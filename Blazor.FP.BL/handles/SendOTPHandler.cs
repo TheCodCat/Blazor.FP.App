@@ -11,6 +11,8 @@ using PasswordGenerator;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Flurl;
+using Flurl.Http;
 
 namespace Blazor.FP.BL.handles
 {
@@ -31,20 +33,31 @@ namespace Blazor.FP.BL.handles
                 var result = await reposRequest.InsertAsync(request.ForgotRequest);
 
                 if (result is null)
-                    return Result.Failure<ForgotPasswordResponceDto>($"database insert error {request.ForgotRequest.Email}/{request.ForgotRequest.Login}");
+                    return Result.Failure<ForgotPasswordResponceDto>($"database insert error {request.ForgotRequest.Login}");
 
-                await Task.Delay(5000);//аля ищим пользователя и если он есть продолжаем
 
                 var otp = Password.ForOtp(4).Next();
-
                 var reposResponce = _factory.GetRepository<ForgotPasswordResponce>();
                 var insert = new ForgotPasswordResponce(otp, result);
                 var responce = await reposResponce.InsertAsync(insert);
-
-                return Result.Success<ForgotPasswordResponceDto>(responce.Adapt<ForgotPasswordResponceDto>());
+                
+                var responceSend = await new Url("https://mfc.samgk.ru/forgot-password/send-otp")
+                    .SetQueryParams(new
+                    {
+                        otp = otp,
+                        login = request.ForgotRequest.Login,
+                        request = request.ForgotRequest.Id,
+                        timeout = request.ForgotRequest.Offset,
+                        createdAt = request.ForgotRequest.Created_in,
+                    })
+                    .GetJsonAsync<ForgotPasswordResponceDto>();
+                
+                
+                return Result.Success<ForgotPasswordResponceDto>(responceSend);
             }
-            catch(Exception ex)
+            catch(FlurlHttpException ex)
             {
+                var mess = await ex.GetResponseStringAsync();
                 return Result.Failure<ForgotPasswordResponceDto>(ex.Message);
             }
         }

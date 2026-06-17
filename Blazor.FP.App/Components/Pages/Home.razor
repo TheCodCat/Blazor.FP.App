@@ -2,6 +2,9 @@
 @using PasswordGenerator
 @using MediatR
 @using Blazor.FP.BL.dtos
+@using Blazor.FP.BL.request
+@using Blazor.FP.Datamodels.models.Models
+@using SQLitePCL
 @rendermode InteractiveServer
 @inject IPasswordGenerator generator
 @inject NavigationManager nav
@@ -13,47 +16,47 @@
 <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="10px">
     <RadzenCard Variant="Variant.Filled">
         <RadzenFieldset Text="Восстановление пароля">
-        <RadzenStack Gap="2em" class="rz-m-4">
-            <RadzenTemplateForm TItem="Model" Data="@_model" Submit="@ActiveDelay">
-
-                <RadzenStack Gap="1em">
-                    <RadzenRow  Gap="2rem">
-
-                        <RadzenColumn Size="12" SizeMD="2">
-                            <RadzenLabel Text="Логин"/>
-                            </RadzenColumn>
-                        <RadzenColumn Size="12" SizeMD="10">
-                            <RadzenTextBox Placeholder="Login" Name="Login" @bind-Value="@_model.Login" Style="display: block; width: 100%;"/>
-                            <RadzenRequiredValidator Component="Login" Text="Логин обязателен" Popup="true" style="position: relative;"/>
-                        </RadzenColumn>
-                        <RadzenColumn Size="12" SizeMD="2">
-                            <RadzenLabel Text="Почта" />
-                        </RadzenColumn>
-                        <RadzenColumn Size="12" SizeMD="10">
-                            <RadzenTextBox Placeholder="Email" Name="Email" @bind-Value="@_model.Email" Style="display: block; width: 100%;"/>
-                            <RadzenRequiredValidator Component="Email" Text="Почта обязательна" Popup="true" style="position: relative;" />
-                            <RadzenEmailValidator Component="Email" Text="Введите корректную почту" Popup="true" style="position: relative;" />
-                        </RadzenColumn>
-
-                    </RadzenRow>
-                    <RadzenRow>
-                        <RadzenStack Orientation="Orientation.Horizontal">
-                            <RadzenButton ButtonType="ButtonType.Submit" Disabled="@(isBusy)" IsBusy="@isBusy" Text="Отправить код" ButtonStyle="ButtonStyle.Primary"/>
-                            <RadzenButton Text="Получил" Disabled="@(!isBusy)" Click="@(() => TakeCode())" ButtonStyle="ButtonStyle.Info"/>
-                        </RadzenStack>
-                    </RadzenRow>
-                </RadzenStack>
-            </RadzenTemplateForm>
             
-            @if (isTake)
+            @if (otp is not null && otp.Status)
             {
-                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1em">
-                    <RadzenSecurityCode Change="Callback" Type="SecurityCodeType.Numeric" Count="4" Gap="0.5em"/>
-                    <RadzenText>@(otp?.OTPCode ?? string.Empty)</RadzenText>
-                </RadzenStack>
+                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success" Text="@otp.Message"/>
+            }
+            else if (otp is not null)
+            {
+                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Warning" Text="@otp.Message"/>
             }
             
-        </RadzenStack>
+            <RadzenStack Gap="2em" class="rz-m-4">
+                <RadzenTemplateForm TItem="Model" Data="@_model" Submit="@SendOtpCode">
+
+                    <RadzenStack Gap="1em">
+                        <RadzenRow Gap="2rem">
+
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Логин"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Placeholder="Login" Name="Login" @bind-Value="@_model.Login" Style="display: block; width: 100%;"/>
+                                <RadzenRequiredValidator Component="Login" Text="Логин обязателен" Popup="true" style="position: relative;"/>
+                            </RadzenColumn>
+
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenButton ButtonType="ButtonType.Submit" Disabled="@(isBusy)" IsBusy="@isBusy" Text="Отправить код" ButtonStyle="ButtonStyle.Primary"/>
+                            </RadzenStack>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTemplateForm>
+
+                @if (isTake)
+                {
+                    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1em">
+                        <RadzenSecurityCode Change="Callback" Type="SecurityCodeType.Numeric" Count="4" Gap="0.5em"/>
+                    </RadzenStack>
+                }
+
+            </RadzenStack>
         </RadzenFieldset>
     </RadzenCard>
 </RadzenStack>
@@ -70,50 +73,40 @@
 
     class Model
     {
-        public string Email { get; set; }
         public string Login { get; set; }
     }
 
-    private async Task ActiveDelay()
+    private async Task SendOtpCode()
     {
         isBusy = true;
-        while (offset.TotalSeconds > TimeSpan.Zero.TotalSeconds)
+
+        var request = new SendOTPRequest(new ForgotPasswordRequest(_model.Login));
+        var responce = await meditor.Send(request);
+        if (responce.IsSuccess)
         {
-            await Task.Delay(1000);
-            offset = offset.Subtract(substract);
-            StateHasChanged();
+            otp = responce.Value;
+            isTake = otp.Status;
         }
+        
         offset = TimeSpan.Zero;
         isBusy = false;
+        
+        
     }
 
-    private async Task TakeCode()
+    private async void Callback(string obj)
     {
         try
         {
-            offset = TimeSpan.Zero;
-            isTake = true;
-            isBusy = false;
-
-            var request = new BL.request.SendOTPRequest(new Datamodels.models.Models.ForgotPasswordRequest(_model.Login, _model.Email));
-            var resultOtp = await meditor.Send(request);
-            if (resultOtp.IsSuccess)
-                otp = resultOtp.Value;
-        }
-        catch(Exception ex)
-        {
-
-        }
-    }
-
-    private void Callback(string obj)
-    {
-        try
-        {
-            if(otp is not null && string.Equals(obj, otp?.OTPCode))
+            if(otp is not null && string.Equals(obj, otp?.OtpCode))
             {
-                if(DateTime.Now <= otp.Created_in.AddMinutes(otp.Offset.TotalMinutes))
-                    nav.NavigateTo($"/change/{otp.RequestId}");
+                if (DateTime.Now <= otp.CreatedAt.AddMinutes(otp.Timeout.TotalMinutes))
+                {
+                    var activeRequest = new ActivatedOtpCodeRequest(otp.RequestId);
+                    var activeResponce = await meditor.Send(activeRequest);
+                    if(activeResponce.IsSuccess)
+                        nav.NavigateTo($"/change/{otp.RequestId}");
+                }
             }
         }
         catch(Exception ex)

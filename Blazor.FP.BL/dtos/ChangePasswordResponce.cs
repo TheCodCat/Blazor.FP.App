@@ -8,6 +8,8 @@ namespace Blazor.FP.BL.dtos
     {
         public int RequestId { get; set; }
         public string Login { get; set; }
+        public string Email { get; set; }
         public bool Result { get; set; } 
+        public string Message { get; set; }
     }
 }

@@ -6,10 +6,12 @@ namespace Blazor.FP.BL.dtos
 {
     public class ForgotPasswordResponceDto
     {
-        public int Id { get; set; }
-        public string OTPCode { get; set; } = string.Empty;
-        public TimeSpan Offset { get; set; }
-        public DateTime Created_in { get; set; }
         public int RequestId { get; set; }
+        public bool Status { get; set; }
+        public string Login { get; set; }
+        public string Message { get; set; }
+        public TimeSpan Timeout { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string OtpCode { get; set; }
     }
 }

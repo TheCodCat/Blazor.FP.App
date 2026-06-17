@@ -23,12 +23,17 @@ namespace Blazor.FP.Datacontext.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
+                    b.Property<DateTime>("Created_in")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Login")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("Offset")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -42,14 +47,8 @@ namespace Blazor.FP.Datacontext.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Created_in")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("OTPCode")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<TimeSpan>("Offset")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("RequestId")

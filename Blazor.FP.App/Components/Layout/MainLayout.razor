@@ -9,7 +9,6 @@
     <RadzenSidebar FullHeight="true" @bind-Expanded="@sidebarExpanded">
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Home" Icon="home" Path="/" />
-            <RadzenPanelMenuItem Text="Counter" Path="counter" Icon="account_box" />
         </RadzenPanelMenu>
         <div class="rz-p-4">
             Sidebar
@@ -23,5 +22,5 @@
 </RadzenLayout>
 
 @code {
-    bool sidebarExpanded = true;
+    bool sidebarExpanded = false;
 }
