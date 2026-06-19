@@ -28,7 +28,7 @@ namespace Blazor.FP.BL.handles
         {
             try
             {
-                var changePass = await _client.Request("change-password")
+                var changePass = await _client.Request("forgot-password/change-password")
                     .PostJsonAsync(new
                     {
                         password = request.Dto.Password,

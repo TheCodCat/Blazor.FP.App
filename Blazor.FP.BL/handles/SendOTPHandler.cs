@@ -21,13 +21,11 @@ namespace Blazor.FP.BL.handles
     {
         private readonly IRepositoryFactory<Forgotcontext> _factory;
         private  readonly IFlurlClient _client;
-        private readonly ILogger _logger;
 
-        public SendOTPHandler(IRepositoryFactory<Forgotcontext> factory, IFlurlClient flurlClient,  ILogger logger)
+        public SendOTPHandler(IRepositoryFactory<Forgotcontext> factory, IFlurlClient flurlClient)
         {
             _factory = factory;
             _client = flurlClient;
-            _logger = logger;
         }
 
         public async Task<Result<ForgotPasswordResponceDto>> Handle(SendOTPRequest request, CancellationToken cancellationToken)
@@ -46,7 +44,6 @@ namespace Blazor.FP.BL.handles
                 var insert = new ForgotPasswordResponce(otp, result);
                 var responce = await reposResponce.InsertAsync(insert);
                 
-                _logger.LogInformation($"{request.ForgotRequest.Id}/отправка");
                 var responceSend = await _client
                     .Request("forgot-password/send-otp")
                     .SetQueryParams(new
@@ -59,13 +56,12 @@ namespace Blazor.FP.BL.handles
                     })
                     .GetJsonAsync<ForgotPasswordResponceDto>();
                 
-                _logger.LogInformation($"{responceSend.Message}/{responceSend.RequestId}");
+                //_logger.LogInformation($"{responceSend.Message}/{responceSend.RequestId}");
                 return Result.Success<ForgotPasswordResponceDto>(responceSend);
             }
             catch(FlurlHttpException ex)
             {
                 var mess = await ex.GetResponseStringAsync();
-                _logger.LogWarning($"{mess}");
                 return Result.Failure<ForgotPasswordResponceDto>(ex.Message);
             }
         }

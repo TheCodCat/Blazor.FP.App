@@ -38,8 +38,6 @@ builder.Services.AddSingleton<IFlurlClient>(sp =>
     return new FlurlClient(settings.Value.baseUrl).WithTimeout(TimeSpan.FromSeconds(30));
 });
 
-builder.Services.AddLogging();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
