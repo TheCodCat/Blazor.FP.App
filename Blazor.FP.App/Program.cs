@@ -1,8 +1,11 @@
+using Blazor.FP.App;
 using Blazor.FP.App.Components;
 using Blazor.FP.BL.request;
 using Blazor.FP.Datacontext.Datacontext;
 using EF.Core.Repositories.Extensions;
+using Flurl.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PasswordGenerator;
 using Radzen;
 
@@ -27,6 +30,15 @@ builder.Services.AddMediatR(cnf =>
 {
     cnf.RegisterServicesFromAssembly(typeof(SendOTPRequest).Assembly);
 });
+builder.Configuration.AddJsonFile("baseUrl.json", false, true);
+builder.Services.Configure<BaseUrl>(builder.Configuration);
+builder.Services.AddSingleton<IFlurlClient>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<BaseUrl>>();
+    return new FlurlClient(settings.Value.baseUrl).WithTimeout(TimeSpan.FromSeconds(30));
+});
+
+builder.Services.AddLogging();
 
 var app = builder.Build();
 

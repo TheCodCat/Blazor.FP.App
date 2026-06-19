@@ -7,33 +7,39 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Flurl;
+using Flurl.Http;
+using Flurl.Http.Configuration;
 
 namespace Blazor.FP.BL.handles
 {
     public class ChangePasswordHandler : IRequestHandler<ChangePasswordRequest, Result<ChangePasswordResponce>>
     {
         private readonly IRepositoryFactory<Forgotcontext> _factory;
+        private readonly IFlurlClient _client;
 
-        public ChangePasswordHandler(IRepositoryFactory<Forgotcontext> factory)
+        public ChangePasswordHandler(IRepositoryFactory<Forgotcontext> factory, IFlurlClient client )
         {
             _factory = factory;
+            _client = client;
         }
 
         public async Task<Result<ChangePasswordResponce>> Handle(ChangePasswordRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                await Task.Delay(7000);
-                
-                var result = new ChangePasswordResponce() { Login = request.Dto.Login, RequestId = request.Dto.Id, Result = true };
-                
-                //аля запрос на изменение пароля
+                var changePass = await _client.Request("change-password")
+                    .PostJsonAsync(new
+                    {
+                        password = request.Dto.Password,
+                        login = request.Dto.Login,
+                    }, cancellationToken: cancellationToken).ReceiveJson<ChangePasswordResponce>();
 
-                return Result.Success<ChangePasswordResponce>(result);
+                return Result.Success<ChangePasswordResponce>(changePass);
             }
-            catch (Exception ex)
+            catch (FlurlHttpException ex)
             {
-                return Result.Failure<ChangePasswordResponce>(ex.Message);
+                return Result.Failure<ChangePasswordResponce>(await ex.Call.Response.GetStringAsync());
             }
         }
     }
