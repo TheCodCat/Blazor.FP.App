@@ -5,9 +5,9 @@ namespace Blazor.FP.BL.request;
 
 public class ActivatedOtpCodeRequest : IRequest<Result<bool>>
 {
-    public readonly int RequestId;
+    public readonly Guid RequestId;
 
-    public ActivatedOtpCodeRequest(int requestId)
+    public ActivatedOtpCodeRequest(Guid requestId)
     {
         RequestId = requestId;
     }

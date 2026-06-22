@@ -2,7 +2,7 @@
 
 public class ForgotPasswordRequest
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Login { get; set; }
     public TimeSpan Offset { get; set; }
     public DateTime Created_in { get; set; }
@@ -11,6 +11,7 @@ public class ForgotPasswordRequest
 
     public ForgotPasswordRequest(string login)
     {
+        Id = Guid.NewGuid();
         Login = login;
         Offset = TimeSpan.FromMinutes(5);
         Created_in = DateTime.Now;

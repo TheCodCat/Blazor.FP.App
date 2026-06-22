@@ -19,9 +19,9 @@ namespace Blazor.FP.Datacontext.Migrations
 
             modelBuilder.Entity("Blazor.FP.Datamodels.models.Models.ForgotPasswordRequest", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created_in")
                         .HasColumnType("TEXT");
@@ -51,8 +51,8 @@ namespace Blazor.FP.Datacontext.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("RequestId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("RequestId")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 

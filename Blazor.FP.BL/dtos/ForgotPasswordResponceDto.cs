@@ -6,7 +6,7 @@ namespace Blazor.FP.BL.dtos
 {
     public class ForgotPasswordResponceDto
     {
-        public int RequestId { get; set; }
+        public Guid RequestId { get; set; }
         public bool Status { get; set; }
         public string Login { get; set; }
         public string Message { get; set; }

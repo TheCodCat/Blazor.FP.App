@@ -9,9 +9,9 @@ namespace Blazor.FP.BL.request
 {
     public class GetForgotPasswordRequest : IRequest<Result<ForgotPasswordRequestDto>>
     {
-        public readonly int RequestId;
+        public readonly Guid RequestId;
 
-        public GetForgotPasswordRequest(int requestId)
+        public GetForgotPasswordRequest(Guid requestId)
         {
             RequestId = requestId;
         }
