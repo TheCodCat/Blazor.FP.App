@@ -1,0 +1,8 @@
+﻿services:
+  blazor.fp.app:
+    image: blazor.fp.app
+    build:
+      context: .
+      dockerfile: Blazor.FP.App/Dockerfile
+    ports:
+      - "5002:8080"

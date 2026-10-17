@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="compose.yaml" />
+  </Folder>
   <Project Path="Blazor.FP.App/Blazor.FP.App.csproj" />
   <Project Path="Blazor.FP.BL/Blazor.FP.BL.csproj" />
   <Project Path="Blazor.FP.Datacontext/Blazor.FP.Datacontext.csproj" />
